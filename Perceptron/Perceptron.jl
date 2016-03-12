@@ -5,7 +5,7 @@ type Perceptron
   tranningSet::Array
   w::Array
 
-  function Perceptron(tranningSet, w =[0,0])
+  function Perceptron(tranningSet, w =[0,0,0])
     this = new()
     this.tranningSet = tranningSet
     this.w = w
@@ -35,17 +35,27 @@ type Perceptron
     end
 
     this.executar = function(x, y)
-      rede = (x * this.w[1]) + (y * this.w[2])
+      rede = (x * this.w[1]) + (y * this.w[2]) + ((-1) * this.w[3])
+      # 0 = (x * 13) + (y * (-6)) + ((-1) * 37)
+      # 0 = 13x - 6y - 37
+      # y = (13x - 37)/6
+      # 0 = (x * 13) + (y * (-6)) + ((-1) * 37)
+      # -(x * 13) =  (y * (-6)) + ((-1) * 37)
+      # -13x = -6y - 37
+      # 13x = 6y + 37
+      # x = (6y + 37)/13
       #println("Rede ",rede)
-      if rede > 0
+      if rede >= 0
         return 1
       end
-      return -1
+      return 0
     end
 
     this.corrigirPeso = function(linha, saida)
       this.w[1] = this.w[1] + (1 * (this.tranningSet[linha,3] - saida) * this.tranningSet[linha,1])
       this.w[2] = this.w[2] + (1 * (this.tranningSet[linha,3] - saida) * this.tranningSet[linha,2])
+      this.w[3] = this.w[3] + (1 * (this.tranningSet[linha,3] - saida) * (-1))
+
       #this.w[1] = this.w[1] + (saida * this.tranningSet[linha,1])
       #this.w[2] = this.w[2] + (saida * this.tranningSet[linha,2])
     end
@@ -62,18 +72,53 @@ perceptron.treinar()
 perceptron.executar(11,12)
 perceptron.executar(1,2)
 
+y0 = (- perceptron.w[3]) / perceptron.w[2]
+x0 = (perceptron.w[3]) / perceptron.w[1]
+xs = [0,x0]
+ys = [y0,0]
 
-perceptron.w
+indexValues1 = findn(tranningSet[:,3])
+indexValues0 = find( temp->(temp == 0), tranningSet[:,3])
 
 Plotly.set_credentials_file({"username"=>"hugdiniz","api_key"=>"hxmxgn0j3x"})
 
 trace = [
-  "x" => tranningSet[:,1],
-  "y" => tranningSet[:,2],
+  "x" => tranningSet[indexValues1,1],
+  "y" => tranningSet[indexValues1,2],
   "mode" => "markers",
   "name" => "Bolotas",
   "marker" => [
     "color" => "rgb(255, 217, 102)",
+    "size" => 12,
+    "line" => [
+      "color" => "white",
+      "width" => 0.5
+    ]
+  ],
+  "type" => "scatter"
+]
+trace2 = [
+  "x" => tranningSet[indexValues0,1],
+  "y" => tranningSet[indexValues0,2],
+  "mode" => "markers",
+  "name" => "Bolotas",
+  "marker" => [
+    "color" => "rgb(0, 217, 102)",
+    "size" => 12,
+    "line" => [
+      "color" => "white",
+      "width" => 0.5
+    ]
+  ],
+  "type" => "scatter"
+]
+trace3 = [
+  "x" => ys,
+  "y" => xs,
+  "mode" => "lines",
+  "name" => "linhas",
+  "marker" => [
+    "color" => "rgb(205, 0, 152)",
     "size" => 12,
     "line" => [
       "color" => "white",
@@ -95,7 +140,7 @@ layout = [
   ]
 ]
 
-response = Plotly.plot([trace], ["layout" => layout, "filename" => "line-style", "fileopt" => "overwrite"])
+response = Plotly.plot([trace,trace2,trace3], ["layout" => layout, "filename" => "line-style", "fileopt" => "overwrite"])
 
 plot_url = response["url"]
 
