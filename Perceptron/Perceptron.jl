@@ -72,10 +72,21 @@ perceptron.treinar()
 perceptron.executar(11,12)
 perceptron.executar(1,2)
 
-y0 = (- perceptron.w[3]) / perceptron.w[2]
+y0 = ( - perceptron.w[3]) / perceptron.w[2]
 x0 = (perceptron.w[3]) / perceptron.w[1]
 xs = [0,x0]
 ys = [y0,0]
+
+indexValues1 = []#findn(tranningSet[:,3])
+indexValues0 = []#find( temp->(temp == 0), tranningSet[:,3])
+
+for  i = 1:length(tranningSet[:,1])
+  if perceptron.executar(tranningSet[i,1],tranningSet[i,2] > 0)
+    indexValues1 = vcat(indexValues1,i)
+  else
+    indexValues0 = vcat(indexValues0,i)
+  end
+end
 
 indexValues1 = findn(tranningSet[:,3])
 indexValues0 = find( temp->(temp == 0), tranningSet[:,3])
@@ -113,8 +124,8 @@ trace2 = [
   "type" => "scatter"
 ]
 trace3 = [
-  "x" => ys,
-  "y" => xs,
+  "x" => xs,
+  "y" => ys,
   "mode" => "lines",
   "name" => "linhas",
   "marker" => [
